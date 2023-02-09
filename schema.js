@@ -1,4 +1,5 @@
-const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLNonNull } = require('graphql')
+const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLNonNull, GraphQLEnumType } = require('graphql')
+const authorModel = require('./Model/authorModel')
 const bookList = [
   { id: '1', name: 'Harry Potter', genre: 'J.K. Rowling', author_id: '1' },
   { id: '2', name: 'The Lord of the Rings', genre: 'J.R.R. Tolkien', author_id: '1' },
@@ -19,6 +20,7 @@ const bookType = new GraphQLObjectType({
     name: { type: GraphQLString },
     genre: { type: GraphQLString },
     author_id: { type: GraphQLID },
+    status: { type: GraphQLString },
     authors_details: {
       type: new GraphQLList(authorType),
       resolve(parent, args) {
@@ -53,7 +55,7 @@ const RootQuery = new GraphQLObjectType({
     allAuthors: {
       type: new GraphQLList(authorType),
       resolve(parent, args) {
-        return authors
+        return authorModel.find({})
       }
     },
     getSingleBook: {
@@ -83,7 +85,18 @@ const Mutation = new GraphQLObjectType({
         id: { type: new GraphQLNonNull(GraphQLID) },
         name: { type: new GraphQLNonNull(GraphQLString) },
         genre: { type: new GraphQLNonNull(GraphQLString) },
-        author_id: { type: GraphQLID }
+        author_id: { type: GraphQLID },
+        status: {
+          type: new GraphQLEnumType({
+            name: "book_status",
+            values: {
+              "new": { value: "Not Available" },
+              "progress": { value: 'Availability in progress' },
+              "ready": { value: 'Available' }
+            }
+          }),
+          defaultValue: "Not Available"
+        }
       },
       resolve(parent, args) {
         bookList.push(args)
@@ -109,6 +122,18 @@ const Mutation = new GraphQLObjectType({
         bookList[parseInt(args.id) - 1].name = args.name
         args.genre ? bookList[parseInt(args.id) - 1].genre = args.genre : ""
         return bookList
+      }
+    },
+    addAuthor:{
+      type:authorType,
+      args: { 
+        // id: { type: new GraphQLNonNull(GraphQLID) },
+        name: { type: new GraphQLNonNull(GraphQLString) },
+        age: { type: new GraphQLNonNull(GraphQLInt) }
+      },
+     resolve(parent, args) {
+        let all_author = authorModel.create(args)
+        return all_author
       }
     }
   }
