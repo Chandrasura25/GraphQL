@@ -6,7 +6,12 @@ const todoSchema = require('./todoSchema');
 const schema = require('./schema');
 const mongoose = require('mongoose')
 const URI = process.env.MONGO_URI
+const cors = require('cors')
 const ElearningSchema = require('./ElearningSchema');
+const bankSchema = require('./bankSchema');
+app.use(cors({
+  origin:"*"
+}))
 app.use('/graphql', graphqlHTTP({
   schema,
   graphiql: true,
