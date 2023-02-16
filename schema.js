@@ -66,7 +66,8 @@ const RootQuery = new GraphQLObjectType({
       args: { id: { type: GraphQLID } },
       // args: { id: { type: GraphQLID },name:{type:GraphQLString} },   
       resolve(parent, args) {
-        return bookList.find((val) => val.id === args.id)
+        // return bookList.find((val) => val.id === args.id)
+        return bookModel.findById(args.id)
       }
     },
     getSingleAuthor: {
@@ -89,7 +90,7 @@ const Mutation = new GraphQLObjectType({
         // id: { type: new GraphQLNonNull(GraphQLID) },
         name: { type: new GraphQLNonNull(GraphQLString) },
         genre: { type: new GraphQLNonNull(GraphQLString) },
-        author_id: { type: GraphQLID },
+        author_id: { type: new GraphQLNonNull(GraphQLID) },
         status: {
           type: new GraphQLEnumType({
             name: "book_status",
